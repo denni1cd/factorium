@@ -1,161 +1,135 @@
 ---
 name: dialogue-investigator
-description: Inspect a target game project and discover the game-specific conditions that determine whether dialogue is plausible. Use before running Dialogue Factory on a new game or after major dialogue-system changes. Produce a dialogue envelope from the actual project rather than relying on a fixed universal template.
+description: Investigate an unfamiliar game's actual dialogue systems, character evidence, reachable contexts, and content conventions before a broad dialogue review. Use for a new target game or after changes that may make its Dialogue Envelope stale. Write a concise, evidence-backed game-specific envelope for Dialogue Factory.
 ---
 
 # Dialogue Investigator
 
 ## Purpose
 
-Understand how dialogue actually works in the target game before Factorium judges or rewrites it.
+Discover what makes dialogue plausible or implausible in this particular game, then give Dialogue Factory a compact guide to those findings. This is a high-reasoning discovery pass, not a dialogue editor and not a code-generation task.
 
-The Investigator is a discovery skill, not a dialogue editor. Its job is to inspect the project broadly, identify what can materially affect a spoken line, and create a game-specific **Dialogue Envelope** that the Dialogue Factory can trust.
+Start with the project, not a universal dialogue model. Use any categories in this skill as search prompts; follow the evidence into systems this skill did not anticipate. Do not assume that a game has a particular stat, character schema, dialogue format, or separation between world, player, and character knowledge.
 
-Do not begin with a rigid predefined list and assume it is complete. Use the categories below as prompts for investigation only. Follow the target game's implementation and authored material wherever they lead.
+## When to use
+
+- Before Dialogue Factory reviews a game for the first time.
+- After a dialogue, character-state, quest, memory/knowledge, routing, or generation change could invalidate the existing envelope.
+- When the existing envelope is missing, stale, too vague for the current review, or contradicted by the project.
+
+If an envelope already exists, read it as a hypothesis to verify against the current project, not as authoritative source material.
 
 ## Primary output
 
-Write or update:
+Create or update this file in the target game project:
 
 ```text
 .factorium/dialogue/DIALOGUE_ENVELOPE.md
 ```
 
-inside the target game workspace unless the user specifies another location.
+Organize it around the target game's actual systems. Do not force every suggested topic below into a section when it does not apply. Keep it compact enough for repeated use during a large dialogue pass, but include enough detail that the Factory can judge a line's speaker, knowledge, trigger, and relevant situation without rediscovering basic game behavior. Point to the best evidence locations, using repository-relative paths and useful symbols, nodes, or file patterns where known.
 
-The envelope should be concise enough for repeated use by the Dialogue Factory but detailed enough to prevent important context from being lost.
+## Investigation sequence
 
-## Investigation process
+### 1. Orient in the project
 
-### 1. Locate the dialogue system
+Read the game's README and any project guidance that explains layout, build/runtime behavior, or content conventions. Identify the engine and likely content formats from the repository itself. If the project is large, use its directory structure, manifests, search, and references from code to narrow the search; do not mistake the first obvious `dialogue` folder for the whole system.
 
-Inspect the project to determine where dialogue lives and how it is selected or generated. Find, as applicable:
+Build a working map of where dialogue is authored, invoked, selected, transformed, localized, or generated. Search for representative content and follow references outward into scripts, quest/event logic, character definitions, prompts, and data. Explore unfamiliar formats through their surrounding code or documentation. Read enough examples to understand the system, then expand where a new path or exception appears.
 
-- authored dialogue files
-- scripts and scene files
-- dialogue trees or node graphs
-- procedural dialogue generators
-- event and quest systems that invoke dialogue
-- character/NPC definitions
-- localization or string tables
-- prompt templates used by runtime AI systems
-- conditions, predicates, tags, or flags that control dialogue selection
+### 2. Establish evidence and its limits
 
-Do not assume one format. A game may spread dialogue behavior across code, data, scripts, prompts, and content files.
+Prefer direct, current project evidence, and match the evidence to the claim:
 
-### 2. Discover dialogue-affecting state
+- For what can happen, trace runtime logic, conditions, and data.
+- For how a character speaks, use that character's canonical dialogue in context.
+- For intended meaning, consult character definitions, design notes, and documentation, then compare them with implementation and authored content.
+- Use setting, genre, or small-sample inference only when direct evidence is missing, and label it as inference.
 
-Identify the state that can materially change what a character should know, believe, feel, intend, or plausibly say.
+Cross-check sources when they disagree. For example, a character bio may describe a restrained speaker while their dialogue becomes profane when frightened; record the situational pattern rather than choosing one source and erasing the other. Do not convert a few lines into a confident, universal voice rule. Say when dialogue is sparse, contradictory, placeholder text, or likely outdated.
 
-Examples may include intelligence, education, profession, expertise, personality, faction, relationship, reputation, quest state, prior choices, memory, knowledge flags, injuries, intoxication, fear, grief, status effects, location, time, inventory, secrets, or prior conversations.
+Use evidence to explain a finding, not just to decorate it with a path. The envelope should make clear which files establish a trigger, which samples establish a voice pattern, and which conclusions remain uncertain.
 
-These are examples only. Include systems because the target game uses them, not because they appear on this list.
+### 3. Trace dialogue paths and triggers
 
-For each important factor, explain how the game represents it and how it can affect dialogue.
+Follow dialogue from its source to the point where a speaker can say it. Determine, as applicable, whether it is reached through conversation trees, barks, quests, ambient events, combat, cutscenes, item interactions, authored scripts, runtime prompts, or other project-specific paths. Look for conditions, fallbacks, shared nodes, substitutions, cached/generated text, and alternate routes.
 
-### 3. Separate kinds of truth
+The goal is to identify materially different legal contexts, not enumerate every state combination. Ask what distinctions could change the line's truth, inference, emotional plausibility, intended effect, or voice. In particular, examine broad conditions that group states a writer or generator may need to treat differently.
 
-Explicitly determine how the game distinguishes, or fails to distinguish, among:
+Example: one route may require that the player completed an investigation, while the speaker's witness flag is optional. The line can then reach a character who knows the culprit and one who only knows that the player returned. The shared route is a knowledge boundary worth exposing, even if both characters occupy the same dialogue node.
 
-- world truth
-- player knowledge
-- speaker knowledge
-- speaker belief or misconception
-- memory available to the speaker
+Example: one conversation node may be reachable both before and after a character has reconstructed a suppressed memory. A line that assumes the recovered memory works only for one group. Record the split and how the Factory can recognize it; do not enumerate unrelated combinations of inventory, weather, and relationship state unless they also change plausibility.
 
-A character must not be treated as knowing a fact merely because the game state contains that fact.
+### 4. Discover state, knowledge, and memory as implemented
 
-### 4. Learn character voice from evidence
+Trace any state that can materially affect what a speaker can know, believe, infer, remember, feel, intend, or say. Candidate search topics may include attributes, expertise, social role, faction, relationship, reputation, quest and choice history, injuries, status effects, location, possessions, secrets, or prior conversations. These are prompts, not a required schema.
 
-Determine what evidence exists for how characters speak. Prefer, in order of usefulness:
+For each relevant system, explain what its values mean in this game and how they affect dialogue or reachability. Do not import generic meanings. If the game models intelligence, for example, inspect what its code and authored dialogue connect it to: inference, abstraction, vocabulary, attention, schooling, or something else. Do not infer that a low value means childish wording unless project evidence supports that reading.
 
-1. existing canonical dialogue from the character
-2. character cards, biographies, stats, traits, and authored notes
-3. established setting and social context
-4. inferred patterns, clearly labeled as inference
+Keep these concepts distinct wherever the game does:
 
-Record relevant patterns without reducing a character to simplistic rules. Intelligence, for example, may influence abstraction, inference depth, causal synthesis, vocabulary, or rhetorical complexity in a game, but should not automatically be translated into "low intelligence = short words" unless the authored game actually establishes that pattern.
+- what is true in the world;
+- what the player has learned;
+- what information is available to this speaker;
+- what the speaker believes, including mistaken beliefs;
+- what the speaker remembers, has forgotten, or has reconstructed.
 
-### 5. Understand triggers and reachable contexts
+Trace the actual information flow. A quest completion flag may describe player progress, not a character's knowledge. A world fact may be available to code without ever being presented to the speaker. Likewise, memory loss may restrict recall without erasing the character's skills or every belief. Do not collapse these states unless the implementation does.
 
-Inspect how a line or dialogue node can be reached. The envelope should teach the Factory how to reason about trigger conditions and identify **materially different reachable contexts** rather than enumerating every possible state combination.
+### 5. Learn character voice and content conventions
 
-Pay special attention to boundary conditions and broad routes that can admit characters with substantially different knowledge, cognition, relationships, memories, or emotional states.
+For important speakers, sample canonical dialogue across enough scenes to distinguish recurring habits from one-off reactions. Where evidence permits, note meaningful patterns in sentence shape, cadence, directness, abstraction, vocabulary, formality, humor, profanity, emotional expression, and rhetorical habits. Include situational shifts, contradictions, development, and uncertainty. Do not turn the result into a formula to imitate mechanically.
 
-### 6. Establish tone and content envelope
+Determine the game's tone and content envelope from its actual writing and stated conventions. Mature language, violence, cruelty, sexual material, offensive characters, dark humor, and other adult content are not defects by themselves. Explain how the game uses such material and what context makes it fit or clash. Do not sanitize or moralize the source material.
 
-Determine the game's intended tone, genre, rating/content level, and how mature material is used.
+### 6. Investigate procedural dialogue when present
 
-Do not treat profanity, violence, cruelty, threats, sexual language, dark humor, or offensive characters as dialogue defects merely because they are mature or unpleasant. Record how such material functions in this game so the Factory can judge consistency rather than morality.
+Follow the generation path from prompt/instructions to supplied context, generation, selection or filtering, storage/reuse, and routing. Determine what the generator receives, what it lacks, whether context is transformed or summarized, and whether one output can appear in materially different situations.
 
-### 7. Inspect procedural generation
+When examples are available, compare recurring failures and locate their likely cause: missing or misleading context, a prompt rule, generation quality, reuse, or routing. If a generator never receives speaker knowledge, patching individual lines will not repair the information leak. Record where the Factory should inspect upstream instructions and context before treating outputs as isolated authored lines.
 
-If dialogue is procedurally generated, determine:
+If no procedural system is found after a reasonable search of runtime entry points and project references, say that none was found in the inspected paths; do not claim that no such system exists everywhere without evidence.
 
-- what inputs the generator receives
-- what character/state context is available to it
-- what context is missing
-- where prompts or generation rules live
-- whether generated text is later filtered, selected, routed, or rewritten
-- whether the same generated line can be reused across materially different contexts
+### 7. Draft a useful envelope
 
-### 8. Challenge the first-pass envelope
+Include the findings the Factory will need repeatedly. Depending on the project, this may cover architecture, key speakers and canonical voice evidence, dialogue-affecting state, knowledge/belief/memory, trigger boundaries, procedural generation, tone, recurring review rules, and unresolved questions. The exact organization and terminology should fit the game.
 
-Before finalizing the envelope, perform an adversarial second pass over the project with the explicit goal of proving the draft incomplete.
+For each significant conclusion, make it actionable: explain the rule or distinction, why it matters to dialogue review, and where to verify it. Highlight high-impact counterexamples and shared routes. Separate observed behavior from design intent and inference when those differ.
 
-Search for:
+Keep the envelope a guide, not a substitute for source inspection. It should direct the Factory to representative evidence and warn it where cases need a deeper source-level check.
 
-- dialogue calls outside the obvious dialogue directories
-- indirect or derived state
-- special-case NPCs
-- alternate quest/event paths
-- hidden knowledge or memory systems
-- runtime-generated prompts
-- unusual routing rules
-- state that changes how a character speaks without being labeled as a dialogue variable
+### 8. Make an adversarial second pass
 
-If an important area remains unclear, record it under **Unresolved / Needs Review** rather than silently guessing.
+After drafting, try to disprove the envelope. Search beyond the directories and file types used in the first pass. Follow unusual speaker definitions, event or quest entry points, indirect/derived state, alternate conversation paths, hidden branches, memory and knowledge mechanics, runtime prompt construction, special-case routing, and references from systems that did not initially look dialogue-related.
 
-## Required Dialogue Envelope sections
+Ask concretely:
 
-Use whatever additional structure best fits the game, but include at least:
+- Is there a way into dialogue that bypasses the route I traced?
+- Can the same trigger admit speakers or states with meaningfully different knowledge, belief, memory, cognition, relationships, or emotional condition?
+- Is a variable only a proxy for player progress, while the dialogue treats it as speaker knowledge?
+- Are there exceptions to a voice or tone pattern, or evidence that changes its meaning?
+- Could generated text be reused under context different from the one that produced it?
+- What plausible project evidence would make a key claim in this envelope false?
 
-```markdown
-# Dialogue Envelope — <Game>
+Update the envelope when this pass finds a missed system or narrows a claim. If evidence cannot settle an important question, state the uncertainty and its practical effect instead of guessing.
 
-## Dialogue Architecture
-Where dialogue comes from and how it is selected/generated.
+## What makes an envelope trustworthy
 
-## Character and Voice Evidence
-What defines characters and how canonical speech should be inferred.
+The envelope is ready when it gives the Factory a reliable starting model of:
 
-## Dialogue-Affecting State
-Game-specific variables/systems that materially alter plausible dialogue.
+- where dialogue originates and how important paths reach it;
+- which game-specific state distinctions can change a line's plausibility;
+- how world/player/speaker knowledge, belief, and memory actually relate;
+- what canonical speech establishes for important characters, with limits called out;
+- how the game's tone and mature content function;
+- how procedural generation works, if present, and where systemic defects can arise;
+- the materially different contexts hidden by broad/shared triggers;
+- the strongest evidence locations and unresolved issues that could change a verdict.
 
-## Knowledge, Belief, and Memory
-How speaker knowledge differs from world/player knowledge.
+Stop when those areas have evidence-backed coverage appropriate to the project's size and scope, and the adversarial pass no longer changes the core model. Do not imply exhaustive coverage. For a very large project, describe which systems, characters, or content areas were sampled and why they represent the relevant paths. Keep an uncertainty visible if it could alter a Factory decision; defer only details unlikely to affect dialogue plausibility.
 
-## Trigger and Context Rules
-How dialogue becomes reachable and what materially different contexts matter.
+## Output review
 
-## Procedural Dialogue
-How generated dialogue works, if present.
+Before finishing, read the envelope as if you were the faster model receiving only that file and its evidence links. Could you identify where to inspect the speaker, line, route, and relevant state? Could you find a counterexample in which the line stops making sense? Does the envelope distinguish what the project proves from what it suggests? If not, tighten the relevant explanation or mark the gap.
 
-## Tone and Content Envelope
-Genre, maturity, profanity/violence conventions, and other relevant tone rules.
-
-## Game-Specific Review Rules
-Important conclusions the Dialogue Factory should apply repeatedly.
-
-## Unresolved / Needs Review
-Anything the investigation could not determine reliably.
-
-## Evidence Map
-Key files/directories/systems used to derive the envelope.
-```
-
-## Completion standard
-
-The Investigator is complete when it can explain, with project evidence, what contextual dimensions the Dialogue Factory must consider and where that evidence comes from.
-
-Do not claim exhaustive certainty when the project is ambiguous. The goal is a strong, game-specific operating model that can be revised as the game changes.
+The final update should briefly report the envelope path, the major systems and context boundaries discovered, any material uncertainty, and the scope of the adversarial second pass. Do not claim the target game's dialogue was audited or repaired; this skill prepares that later work.
