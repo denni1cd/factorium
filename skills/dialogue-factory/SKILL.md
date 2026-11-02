@@ -1,173 +1,129 @@
 ---
 name: dialogue-factory
-description: Audit and repair dialogue in a target game using the game-specific Dialogue Envelope produced by Dialogue Investigator. Use to evaluate whether each line makes sense for the speaking character across materially different reachable contexts, preserving good authored work and distinguishing routing, variant, and rewrite problems.
+description: Audit and conservatively repair dialogue in a target game using its game-specific Dialogue Envelope. Evaluate character, scene, knowledge, voice, and materially different reachable contexts; distinguish routing, variant, and rewrite defects.
 ---
 
 # Dialogue Factory
 
-## Purpose
+## Purpose and prerequisite
 
-Evaluate and improve game dialogue at scale without flattening character voice or rewriting good authored material.
-
-Dialogue Factory consumes the target game's:
+Dialogue Factory is the high-volume dialogue QA and repair stage of Factorium. Its primary input is the target game's:
 
 ```text
 .factorium/dialogue/DIALOGUE_ENVELOPE.md
 ```
 
-produced by Dialogue Investigator.
+Use the envelope together with the actual game repository. The envelope explains what to look for; the repository provides evidence about the specific line, its speaker, scene, implementation, and reachable states.
 
-Do not run a broad factory pass without a usable envelope. If the envelope is missing, obviously stale, or contradicted by the current project, invoke or request Dialogue Investigator first.
+Do not begin a broad pass without a usable, current envelope. If it is missing, stale, or contradicted by the project, stop the broad pass and run or request Dialogue Investigator. Do not fill gaps with generic assumptions.
 
-## Core question
+## Governing question
 
-For each dialogue item, ask:
+For every item under review, ask:
 
-> Given this speaker, the established character evidence, the immediate scene, and every materially different context that can legitimately reach this dialogue, is this utterance plausible for this character here?
+> Given who this character is, how they normally speak, what they know or believe, what is happening in the scene, and every materially different legal context that can reach this dialogue, does this line make sense for this character here?
 
-Do not reduce the task to "is this sentence well written?"
+This is a character-and-context QA pass, not generic copyediting. Existing dialogue is evidence of authored voice. Awkwardness, vulgarity, terseness, verbosity, confusion, repetition, pomposity, formality, limited abstraction, or emotional instability may be intentional. Do not polish these traits away. A stylistically different alternative is not proof of a defect.
 
-## Evidence to gather for each dialogue item
+## Work a batch
 
-Use the envelope to locate the relevant context. Gather enough evidence to judge the line, including as applicable:
+Choose a coherent unit such as a character, scene, quest, chapter, dialogue file, or generator. Keep its bounds clear so coverage is visible. For each item:
 
-- speaker identity
-- character card, stats, traits, background, and relevant modeled attributes
-- representative canonical speech from the same character
-- immediate preceding/following dialogue or scene context
-- narrative purpose or intended meaning of the line
-- trigger/routing conditions
-- materially different legal contexts that satisfy those triggers
-- speaker knowledge, belief, memory, or misconception in those contexts
-- relationship to the listener
-- relevant emotional or physical state
-- game-specific tone/content rules
+1. **Locate the source and purpose.** Identify its speaker, listener, scene, narrative job, and nearby canonical dialogue. If generated at runtime, locate the generator and the inputs that produce it.
+2. **Check the envelope's relevant rules.** Use the game-specific voice evidence, knowledge and memory model, state, trigger rules, and tone. Inspect the actual implementation or authored data for the predicates and evidence that decide reachability; do not rely on a summary when the source can settle the question.
+3. **Identify what the line presupposes.** Note the facts, memories, observations, inferences, expertise, relationship, emotion, and prior exchange a character would need for this exact utterance. Include implications and certainty, not only explicit claims.
+4. **Probe for counterexamples.** Find materially different legal contexts admitted by the route that could change the judgment. In particular, check the context boundaries the envelope identifies: for example, remembered versus unavailable memories, witness versus hearsay, low versus high expertise, or different relationship or quest states. Establish whether each context is genuinely reachable; do not enumerate every theoretical combination.
+5. **Choose an outcome only when evidence supports it.** Leave a plausible line untouched. If defective, identify whether the defect is routing, a need for distinct realizations, or the wording/content itself. If the evidence is missing, contradictory, or too difficult to resolve reliably at the current model's capability, flag the case for review or escalation rather than guessing.
+6. **Make the smallest effective repair and re-evaluate it.** Recheck new or changed text against the same intended contexts and counterexample that exposed the defect. Generation is not self-validating.
 
-Avoid loading irrelevant state simply because it exists.
+Look for evidence in the places relevant to the item: surrounding dialogue, character files, scene and quest scripts, dialogue data, conditionals, event/state logic, knowledge or memory systems, and generator prompts or supplied context. Avoid loading unrelated systems simply because they exist.
 
-## Materially different contexts
+## Reachable context and judgment
 
-Do not attempt a Cartesian product of every game variable.
+Do not ask only whether an imagined context makes a line work. Try to disprove the line's fit by finding a legitimate context the game allows to reach it where it stops making sense. Reason from actual conditions and the Dialogue Envelope; do not assume world truth or player knowledge is available to the speaker.
 
-Instead, identify semantic differences that could reasonably change whether the line makes sense. Probe boundaries and contrasts such as:
+Judge only dimensions the game establishes as relevant. These can include:
 
-- minimum versus high intelligence when intelligence affects expression or reasoning
-- remembered versus uncertain/reconstructed knowledge
-- direct witness versus second-hand knowledge
-- weak versus strong relationship or hostility
-- novice versus expert domain knowledge
-- calm versus extreme emotional state
-- materially different quest outcomes that share a route
+- what the speaker witnessed, learned, remembers, believes, misunderstands, or has forgotten;
+- whether the speaker can form the line's inference or level of abstraction from available observations;
+- intelligence, education, profession, expertise, or other modeled traits as the game defines them;
+- canonical vocabulary, register, cadence, rhetoric, repetition, humor, or other voice patterns;
+- emotion, physical state, relationship, social role, prior choices, or recent interaction;
+- whether the line responds to the immediate exchange or instead sounds like player-facing exposition, a system summary, or clinical AI prose;
+- whether a generic line erases a meaningful distinction between states.
 
-The exact dimensions come from the Dialogue Envelope, not from this list.
+Do not translate modeled intelligence into a crude word-length rule. It may affect inference depth, causal synthesis, abstraction, recognition of contradiction, or another behavior established by this game. Use canonical speech and implementation as evidence. Label uncertain inference as uncertain.
 
-The Factory should actively seek counterexamples: try to find a legal context where the candidate line stops making sense.
-
-## What to judge
-
-Judge dialogue against the target game's discovered rules. Relevant questions may include:
-
-- Would this character know or believe what the line asserts?
-- Does the reasoning or abstraction fit the character's modeled cognition and established behavior?
-- Does the vocabulary, register, cadence, directness, humor, profanity, formality, or rhetorical style fit the speaker?
-- Does the line sound like this character rather than generic AI prose?
-- Does the emotional state fit the wording?
-- Would the character say this to this listener?
-- Does the line respond naturally to the scene rather than summarize information for the player?
-- Is the speaker compressing facts into a sophisticated conclusion they could not plausibly reach?
-- Is world/player knowledge leaking into the character?
-- Does the line read like author exposition instead of spontaneous speech?
-- If the game intentionally uses stylized dialogue, does the line fit that style?
-
-Do not penalize profanity, violence, threats, cruelty, sexual language, dark humor, or other mature content merely because it is mature. Judge whether it fits the game's envelope, speaker, scene, and intended rating/content level.
+Profanity, violence, threats, cruelty, sexual language, dark humor, offensive characters, and disturbing themes are not defects merely because they are mature or unpleasant. Judge whether they fit the speaker, scene, game envelope, and intended content level. Do not sanitize the game.
 
 ## Outcomes
 
-Classify each meaningful problem as one of four outcomes.
+Apply the outcome to the defect, not as a forced label for every reviewed line. If a line has independent defects, record them separately.
 
 ### PASS
 
-The dialogue is plausible across the materially different reachable contexts examined.
-
-Action: leave it alone.
+The line plausibly works across the materially different reachable contexts examined, and matches its intended scene and speaker. PASS is a supported judgment, not simply the absence of an obvious problem during a skim. Leave the line unchanged. Routine PASS items need little or no individual reporting.
 
 ### ROUTE
 
-The line itself is good, but one or more current trigger paths can reach it in a context where it does not make sense.
-
-Action: prefer changing/narrowing routing or conditions over rewriting the line.
+The line is good for its intended context, but the current conditions also allow it to appear in a context where it does not belong. Narrow or correct the trigger, condition, state supplied, or other routing. Preserve the line where it works.
 
 ### VARIANT
 
-The current route legitimately covers multiple distinct contexts that should not share the exact same realization.
-
-Action: preserve the existing line where it works and create the minimum additional dialogue variant(s) needed for the other context(s), with appropriate routing.
+Multiple contexts are intentionally meant to reach the same dialogue beat, but they need different realizations to preserve character plausibility. Keep the existing line in the context where it works and add only the needed variant or variants, with conditions that select them correctly. Do not create variants for merely stylistic alternatives.
 
 ### REWRITE
 
-The line itself does not plausibly work for the intended speaker/context, or is stilted, clinically phrased, exposition-heavy, voice-inconsistent, or otherwise defective even under the route where it was meant to work.
+The line itself is defective for its intended context, even with correct routing. Replace it while preserving its semantic purpose: relevant facts, scene function, and what the character is trying to do. Express that purpose in this character's voice; do not impose generic polished prose.
 
-Action: replace it while preserving the narrative intent, facts that should be conveyed, scene function, and character voice.
+### Review / escalation
 
-If evidence is insufficient to choose reliably, mark it for review rather than inventing missing game facts.
+Do not force PASS, ROUTE, VARIANT, or REWRITE when key evidence is unresolved, project sources conflict, reachability is unclear, or the case requires reasoning the current model cannot do reliably. Record the exact uncertainty and the evidence needed. Escalate difficult or ambiguous cases to a stronger model or a human reviewer when available; keep the clear routine items moving.
+
+## A compact distinction
+
+Suppose the envelope says a character remembers only events they personally witnessed, and the quest's shared dialogue beat is intended to work whether or not they witnessed the gate attack.
+
+- **Bad line — REWRITE:** “I saw the captain order the attack,” although the character has no observation or evidence of that order in any intended context. The assertion is unsupported even on the route where the line was meant to play. Rewrite it to serve the beat using only what the character could know.
+- **Good line, bad routing — ROUTE:** “I saw the gate fall” is established, appropriate witness dialogue, but its current trigger also admits characters who were elsewhere. Restrict this line to witnesses; do not rewrite good witness dialogue to accommodate the faulty condition.
+- **Legitimate variant — VARIANT:** Both witness and absent-character contexts should reach the beat. Preserve “I saw the gate fall” for witnesses and add a response such as “I found the gate already down; I don't know how it fell” for an absent character who observed the aftermath. Do not route the absent character out if the scene is meant to include them.
+
+The same suspicious wording can therefore call for different repairs depending on intended reachability and scene purpose. Verify those from the game.
 
 ## Repair rules
 
-When modifying dialogue:
+- Preserve good authored dialogue, including unusual or rough voices.
+- Prefer the smallest change that actually fixes the defect.
+- For ROUTE, fix the condition rather than changing good prose.
+- For VARIANT, split only the line or branch that needs a different realization; do not duplicate a conversation unnecessarily.
+- For REWRITE, understand the semantic job first, then preserve relevant facts, intent, and character identity.
+- Use the same character's canonical dialogue as behavioral evidence when available; do not mechanically imitate a sample.
+- Do not invent character facts, memories, motivations, or game rules to justify a preferred rewrite.
+- After editing, evaluate the new line or routing against the same counterexample. Reject a repair that creates a new implausibility.
 
-1. Preserve narrative intent before preserving wording.
-2. Preserve good authored text whenever possible.
-3. Prefer the smallest effective change.
-4. Do not rewrite a line merely because an alternate phrasing is also good.
-5. Do not homogenize characters toward a single "natural" voice.
-6. Use canonical dialogue as behavioral evidence, not as text to imitate mechanically.
-7. If a character's state justifies awkward, fragmented, repetitive, vulgar, formal, confused, or unusual speech, preserve that distinction.
-8. Fix routing when routing is the defect.
-9. Add variants only where materially different contexts require them.
-10. Re-evaluate a newly written variant or rewrite against the same context before accepting it.
+## Procedural dialogue and repeated failures
 
-## Procedural dialogue
+For generated or templated dialogue, inspect the source instructions, context supplied to the generator, state/knowledge inputs, selection rules, and output routing. Consider whether the individual output is the right repair target.
 
-For runtime-generated dialogue, inspect the generation prompt/rules and the context supplied to them.
+As the batch proceeds, keep a compact working note of recurring causes and affected locations. If several failures share a source—missing character context, incorrect knowledge, broad conditions, reused output across incompatible states, or flattened voice instructions—address that source before patching every instance. Then review or regenerate affected outputs and sample them in their actual contexts. Do not claim a systemic fix without checking its downstream results.
 
-If many failures share the same cause, prefer repairing the generator or its supplied context rather than patching generated examples one at a time.
+## Scale and escalation
 
-Examples:
+Use a fast capable model for routine items when available, relying on the envelope's evidence map and focused source reads. Reserve deeper reasoning for items with ambiguous knowledge or memory, subtle cognitive demands, conflicting routes, major narrative consequences, or uncertain repair choices. Escalate those cases individually where possible; do not let a few hard items turn a large batch into guesses or stall clear work.
 
-- missing character intelligence/context -> improve generator context
-- speaker knows world facts they were never given -> fix knowledge context
-- every character uses the same rhetorical style -> strengthen character evidence/prompting
-- one broad generated response is reused across incompatible states -> split routing or generation conditions
+Keep review overhead proportional to risk: inspect enough context to support each PASS, but do not write an essay for it. Spend analysis and output on actual defects, uncertain cases, and repeated patterns. Keep a compact batch progress note during long runs so reviewed regions, open cases, and systemic findings are not lost.
 
-## Factory pass strategy
+## Audit trail
 
-For large games, work iteratively rather than producing an enormous undifferentiated report.
+The changed game content is the primary output. For meaningful modifications, maintain a concise audit note in the project's existing work log or, if none is in use, `.factorium/dialogue/FACTORY_AUDIT.md`. Record only what is needed to understand:
 
-A useful pass is:
+- location or stable dialogue/node identifier;
+- outcome: ROUTE, VARIANT, or REWRITE;
+- the counterexample or defect that warranted the change;
+- what was changed.
 
-1. select a coherent dialogue region, character, quest, or batch
-2. gather context from the project and envelope
-3. evaluate each item
-4. leave PASS items untouched
-5. repair ROUTE, VARIANT, and REWRITE items
-6. re-check changed dialogue
-7. continue to the next batch
+Do not list every PASS unless requested. For a generator or routing fix affecting many lines, record the shared cause and affected scope rather than repeating the same explanation per line.
 
-Use a capable larger model when a case requires substantial contextual reasoning. Routine iteration over well-understood dialogue may use a faster model when available.
+## Completion standard
 
-## Reporting
-
-Maintain a concise audit trail in the workspace when useful. It should identify changed dialogue and why, but should not bury the project in commentary for PASS items.
-
-For each changed item, record enough to understand:
-
-- location/node
-- outcome: ROUTE, VARIANT, or REWRITE
-- triggering counterexample or defect
-- change made
-
-The finished game content is the primary output; the audit trail is secondary.
-
-## Success standard
-
-A successful Dialogue Factory pass should make the game's dialogue feel as though it came from the characters and situations that actually exist in the game—not from a generic dialogue model—while preserving the author's intended narrative and minimizing unnecessary edits.
+A successful Factory pass leaves working dialogue alone, repairs only evidenced defects, catches materially different legal contexts through counterexample-driven review, and preserves the game's own character voices and content. Every accepted repair has been checked again; unresolved cases are clearly surfaced; repeated failures are addressed at their source where practical.
