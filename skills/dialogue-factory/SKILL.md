@@ -1,6 +1,6 @@
 ---
 name: dialogue-factory
-description: Audit and conservatively repair dialogue in a target game using its game-specific Dialogue Envelope. Evaluate character, scene, knowledge, voice, and materially different reachable contexts; distinguish routing, variant, and rewrite defects.
+description: Audit and conservatively repair game dialogue using a discovered Dialogue Envelope, a persistent source inventory, and a separate user-defined creative direction. Reuse verified findings for incremental passes; distinguish routing, variant, and rewrite defects.
 ---
 
 # Dialogue Factory
@@ -17,6 +17,19 @@ Use the envelope together with the actual game repository. The envelope explains
 
 Do not begin a broad pass without a usable, current envelope. If it is missing, stale, or contradicted by the project, stop the broad pass and run or request Dialogue Investigator. Do not fill gaps with generic assumptions.
 
+## Reusable context, direction, and incremental passes
+
+In addition to the envelope, read these files in the target game's `.factorium/dialogue/` folder when present:
+
+- `DIALOGUE_INVENTORY.md`: locations, speakers, triggers, generators, source evidence, and indexed coverage. Use it as a **map** for focused source reads, not as proof that every reachable state has been checked. If absent, seed a small navigational inventory as batches are inspected; do not stop the entire Factory to inventory every line.
+- `DIALOGUE_DIRECTION.md`: current **user-selected artistic direction**, scope, and exceptions. This is separate from project facts. If missing or unspecified, do not impose strict realism, cinematic dialogue, or an imagined house style; follow known game conventions and surface decisions that genuinely depend on author preference.
+- `FACTORY_AUDIT.md`: prior accepted fixes, counterexamples, unresolved cases, and completed batches. Verify whether those conclusions still apply to the current sources and direction.
+
+Before starting or resuming a broad pass, determine **what changed**: game source/character/trigger knowledge, the creative direction, or both. Reuse supported discoveries rather than repeating them, but **never assume a prior PASS is valid for a newly changed criterion**.
+
+On a change of creative direction (for example, naturalistic to heightened dramatic dialogue), identify the style-sensitive regions or previously reviewed issues, and selectively re-evaluate their delivery while retaining sound knowledge/routing findings **unless the change could affect them**. A drastic global style change may legitimately require rereading most dialogue; the inventory saves rediscovery, not the creative judgment itself. If source files or routing changed, refresh the affected evidence and ask Investigator for a targeted envelope update when needed, instead of resetting everything by default.
+
+Only skip an item as already reviewed when the existing record reasonably identifies the content or region reviewed, which quality dimensions were checked, and the direction/source version those conclusions relied on. When that evidence is insufficient, recheck rather than invent coverage.
 ## Governing question
 
 For every item under review, ask:
@@ -27,7 +40,7 @@ This is a character-and-context QA pass, not generic copyediting. Existing dialo
 
 ## Work a batch
 
-Choose a coherent unit such as a character, scene, quest, chapter, dialogue file, or generator. Keep its bounds clear so coverage is visible. For each item:
+Choose a coherent unit such as a character, scene, quest, chapter, dialogue file, or generator. Prefer the inventory's mapped units and affected regions on repeat passes. Keep batch bounds clear so coverage is visible. For each item:
 
 1. **Locate the source and purpose.** Identify its speaker, listener, scene, narrative job, and nearby canonical dialogue. If generated at runtime, locate the generator and the inputs that produce it.
 2. **Check the envelope's relevant rules.** Use the game-specific voice evidence, knowledge and memory model, state, trigger rules, and tone. Inspect the actual implementation or authored data for the predicates and evidence that decide reachability; do not rely on a summary when the source can settle the question.
@@ -111,7 +124,7 @@ As the batch proceeds, keep a compact working note of recurring causes and affec
 
 Use a fast capable model for routine items when available, relying on the envelope's evidence map and focused source reads. Reserve deeper reasoning for items with ambiguous knowledge or memory, subtle cognitive demands, conflicting routes, major narrative consequences, or uncertain repair choices. Escalate those cases individually where possible; do not let a few hard items turn a large batch into guesses or stall clear work.
 
-Keep review overhead proportional to risk: inspect enough context to support each PASS, but do not write an essay for it. Spend analysis and output on actual defects, uncertain cases, and repeated patterns. Keep a compact batch progress note during long runs so reviewed regions, open cases, and systemic findings are not lost.
+Keep review overhead proportional to risk: inspect enough context to support each PASS, but do not write an essay for it. Spend analysis and output on actual defects, uncertain cases, and repeated patterns. Keep a compact, durable batch progress note during long runs so reviewed regions, open cases, and systemic findings survive handoffs or resumed sessions. Checkpoint at sensible batch boundaries rather than only in a final report.
 
 ## Audit trail
 
@@ -124,6 +137,8 @@ The changed game content is the primary output. For meaningful modifications, ma
 
 Do not list every PASS unless requested. For a generator or routing fix affecting many lines, record the shared cause and affected scope rather than repeating the same explanation per line.
 
+As each batch completes, update `DIALOGUE_INVENTORY.md` with its coverage (sampled/reviewed/remaining), meaningful source locations or stable node IDs, relevant source revision when available, and which dimensions were examined (e.g., route/knowledge/voice/direction). Record the direction version or date/summary used. Group routine PASS outcomes by region; don't turn the inventory into thousands of repetitive PASS records. Record which batches remain or need re-evaluation and why. Do not overwrite earlier findings without retaining the material reason for their invalidation.
+
 ## Completion standard
 
-A successful Factory pass leaves working dialogue alone, repairs only evidenced defects, catches materially different legal contexts through counterexample-driven review, and preserves the game's own character voices and content. Every accepted repair has been checked again; unresolved cases are clearly surfaced; repeated failures are addressed at their source where practical.
+A successful Factory pass leaves working dialogue alone, repairs only evidenced defects, catches materially different legal contexts through counterexample-driven review, preserves the game's own character voices and content, and leaves a usable inventory/progress record for a later incremental pass. Every accepted repair has been checked again; unresolved cases are clearly surfaced; repeated failures are addressed at their source where practical.
