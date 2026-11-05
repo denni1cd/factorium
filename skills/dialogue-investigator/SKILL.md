@@ -1,6 +1,6 @@
 ---
 name: dialogue-investigator
-description: Investigate an unfamiliar game's actual dialogue systems, character evidence, reachable contexts, and content conventions before a broad dialogue review. Use for a new target game or after changes that may make its Dialogue Envelope stale. Write a concise, evidence-backed game-specific envelope for Dialogue Factory.
+description: Investigate a game's dialogue systems and build a reusable evidence-backed Dialogue Envelope and navigational Inventory. Use before broad Dialogue Factory review or when the game changes; preserve discovered facts separately from the user's changeable creative direction.
 ---
 
 # Dialogue Investigator
@@ -29,6 +29,23 @@ Create or update this file in the target game project:
 
 Organize it around the target game's actual systems. Do not force every suggested topic below into a section when it does not apply. Keep it compact enough for repeated use during a large dialogue pass, but include enough detail that the Factory can judge a line's speaker, knowledge, trigger, and relevant situation without rediscovering basic game behavior. Point to the best evidence locations, using repository-relative paths and useful symbols, nodes, or file patterns where known.
 
+## Persist discoveries for future passes
+
+Investigation is expensive; preserve the map so later direction changes do not require rediscovering the whole project. Alongside the envelope, create or update:
+
+- `.factorium/dialogue/DIALOGUE_INVENTORY.md` — a **navigational index**, not a second copy of the game or an exhaustive per-line database. Start with an entry per useful unit (file, scene, quest, character, generator, or dialogue cluster); refine to nodes only where useful. Link to source paths or stable identifiers, important speakers and trigger/context dependencies, canonical-voice evidence, and procedural entry points.
+- For each indexed unit, make **coverage** explicit (mapped, sampled, reviewed, not yet examined, or unclear). Note last inspected source revision/commit or file reference when available and what remains unknown. Do not equate 'found the file' with 'understood all routes.'
+- Reuse existing inventory entries when still supported by source; update only impacted areas and record new paths or contradicted assumptions. Do not repeatedly inventory unchanged areas just to produce a newer timestamp.
+- Keep the inventory compact. Group repetitive content and link back to actual source. Avoid requiring a full inventory of every line before the Factory can start; the Factory can refine it during review.
+
+Keep **creative direction** separate from discovered game mechanics:
+
+- `.factorium/dialogue/DIALOGUE_DIRECTION.md` records the user's current explicit artistic goals and scope, for example naturalistic versus heightened speech, pacing, exposition tolerance, or character-specific exceptions.
+- Do not infer a permanent preference for 'realism' or another style from the game genre or from one example. If no direction has been provided, leave it explicitly unspecified (or draft a clearly marked, unapproved starter for the user); never silently treat an inferred direction as a requirement.
+- A direction change usually calls for a **Factory style-impact pass**, not a new full Investigator run. Reinvestigate only when dialogue architecture, character facts, trigger logic, voice evidence, or other underlying discoveries are stale.
+- If evidence about the game conflicts with an explicit creative direction, record the tension; do not silently rewrite lore or character state as a shortcut to matching style.
+
+These are lightweight Markdown artifacts maintained **in the target game workspace**, not in Factorium itself. No new database, parser, schema, or standing agent is required.
 ## Investigation sequence
 
 ### 1. Orient in the project
@@ -90,13 +107,15 @@ When examples are available, compare recurring failures and locate their likely 
 
 If no procedural system is found after a reasonable search of runtime entry points and project references, say that none was found in the inspected paths; do not claim that no such system exists everywhere without evidence.
 
-### 7. Draft a useful envelope
+### 7. Draft a useful envelope and inventory
 
 Include the findings the Factory will need repeatedly. Depending on the project, this may cover architecture, key speakers and canonical voice evidence, dialogue-affecting state, knowledge/belief/memory, trigger boundaries, procedural generation, tone, recurring review rules, and unresolved questions. The exact organization and terminology should fit the game.
 
 For each significant conclusion, make it actionable: explain the rule or distinction, why it matters to dialogue review, and where to verify it. Highlight high-impact counterexamples and shared routes. Separate observed behavior from design intent and inference when those differ.
 
 Keep the envelope a guide, not a substitute for source inspection. It should direct the Factory to representative evidence and warn it where cases need a deeper source-level check.
+
+Update the inventory from paths and content actually inspected: index dialogue areas, recurring entry points, relevant voice sources, and trigger dependencies, identifying sampled versus unexamined areas. Preserve useful previous entries unless source evidence invalidates them. A large game may begin with a coarse index; do not block completion on line-level enumeration.
 
 ### 8. Make an adversarial second pass
 
@@ -132,4 +151,4 @@ Stop when those areas have evidence-backed coverage appropriate to the project's
 
 Before finishing, read the envelope as if you were the faster model receiving only that file and its evidence links. Could you identify where to inspect the speaker, line, route, and relevant state? Could you find a counterexample in which the line stops making sense? Does the envelope distinguish what the project proves from what it suggests? If not, tighten the relevant explanation or mark the gap.
 
-The final update should briefly report the envelope path, the major systems and context boundaries discovered, any material uncertainty, and the scope of the adversarial second pass. Do not claim the target game's dialogue was audited or repaired; this skill prepares that later work.
+The final update should briefly report the envelope and inventory paths, the major systems and context boundaries discovered, uncovered or unexamined areas, any material uncertainty, and the scope of the adversarial second pass. Do not claim the target game's dialogue was audited or repaired; this skill prepares that later work.
