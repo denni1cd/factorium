@@ -1,13 +1,13 @@
 ---
 name: art-investigator
-description: Discover an existing game's artwork, visual conventions, asset usage, dependencies, rendering requirements, and reachable production tools. Produce a reusable evidence-backed Art Envelope and compact Art Inventory for Art Foundry; do not make unauthorized artistic decisions.
+description: Discover an existing game's artwork, visual conventions, asset usage, dependencies, rendering requirements, and reachable production tools. Produce a reusable evidence-backed Art Envelope and compact Art Inventory for Art Factory; do not make unauthorized artistic decisions.
 ---
 
 # Art Investigator
 
 ## Mission
 
-Investigate the actual target game before Art Foundry makes broad art changes. Discover what assets exist, how they are used, what the engine requires, which visual conventions appear intentional, and how changes propagate across dependent assets. This is a discovery skill, not an image generator or an autonomous art director.
+Investigate the actual target game before Art Factory makes broad art changes. Discover what assets exist, how they are used, what the engine requires, which visual conventions appear intentional, and how changes propagate across dependent assets. This is a discovery skill, not an image generator or an autonomous art director.
 
 Treat the game as evidence. Do not assume a genre, art style, engine, sprite format, character model, rendering pipeline, or available generation tool. Concentrate on the user-selected scope and expand only when cross-cutting references matter.
 
@@ -16,7 +16,7 @@ Treat the game as evidence. Do not assume a genre, art style, engine, sprite for
 - .factorium/art/ART_ENVELOPE.md — compact, sourced map of the project's art systems, visual conventions, production constraints, and uncertainties.
 - .factorium/art/ART_INVENTORY.md — navigational asset index, dependencies, source references, revisions, and coverage; never an unnecessary complete duplicate of every image.
 - .factorium/art/ART_DIRECTION.md — user-controlled desired visual destination, scope, references, preservation rules, and approvals. Read if present, but do not fabricate or approve it.
-- .factorium/art/ART_AUDIT.md — maintained primarily by Art Foundry; read when earlier changes affect discovery.
+- .factorium/art/ART_AUDIT.md — maintained primarily by Art Factory; read when earlier changes affect discovery.
 
 If ART_DIRECTION.md is absent, offer the provided starter template for user approval. Clearly distinguish inferred visual observations from desired creative direction. Do not silently elevate existing artwork, recent model output, or genre conventions into an approved direction.
 
@@ -73,9 +73,9 @@ Before completing discovery, actively look for exceptions outside obvious asset 
 
 Record what's actually inspected, what's merely inferred, and what cannot be verified. Do not mark all assets as visually reviewed because their directory was scanned.
 
-## Handoff to Art Foundry
+## Handoff to Art Factory
 
-Provide the envelope and inventory paths, discovered boundaries, important visual contradictions, dependencies, available tooling, missing direction decisions, and a small representative set suitable for real generation/integration examples. Do not recommend a global redesign yourself. Art Foundry makes recommendations only through its required feasibility, sample, adversarial-review, and user-approval gates.
+Provide the envelope and inventory paths, discovered boundaries, important visual contradictions, dependencies, available tooling, missing direction decisions, and a small representative set suitable for real generation/integration examples. Do not recommend a global redesign yourself. Art Factory makes recommendations only through its required feasibility, sample, adversarial-review, and user-approval gates.
 
 ## Scope exclusions
 
