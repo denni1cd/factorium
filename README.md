@@ -2,7 +2,7 @@
 
 Factorium is a game-modification suite built around reusable AI skills. Its purpose is to let an agent inspect a real game project, learn how that specific project works, and then perform focused modification or quality passes without forcing the game into a rigid universal template.
 
-The first Factorium module is **Dialogue Factory**.
+Factorium currently defines two reusable modules: **Dialogue Factory** and **Art Factory**.
 
 ## V0.1: Dialogue Factory
 
@@ -50,13 +50,46 @@ Dialogue Factory + DIALOGUE_DIRECTION.md
 ```text
 factorium/
 ├── README.md
+├── docs/
+│   └── WORK_ART_FACTORY_HANDOFF.md
 └── skills/
     ├── dialogue-investigator/
     │   └── SKILL.md
-    └── dialogue-factory/
-        └── SKILL.md
+    ├── dialogue-factory/
+    │   └── SKILL.md
+    ├── art-investigator/
+    │   └── SKILL.md
+    └── art-factory/
+        ├── SKILL.md
+        └── ART_DIRECTION_TEMPLATE.md
 ```
 
 The target game, not the Factorium skills repository, holds optional working artifacts under `.factorium/dialogue/`: `DIALOGUE_ENVELOPE.md` (discovered logic), `DIALOGUE_INVENTORY.md` (source map and coverage), `DIALOGUE_DIRECTION.md` (user-controlled artistic goals), and `FACTORY_AUDIT.md` (changes and unresolved cases). Build these progressively; a full per-line index is not a prerequisite.
 
-Future Factorium modules may add other Investigator and Factory skills, but V0.1 intentionally stays focused on dialogue until the workflow has been tested against real games.
+V0.1 established the dialogue workflow. The art module below is a separate skill system and should be tested in the actual Work execution environment before claiming full production readiness.
+
+## V0.2: Art Factory (skill definitions; Work validation pending)
+
+Art Factory extends Factorium to existing game art. It uses two skills:
+
+1. **Art Investigator** — discover active artwork, visual conventions, authoritative references, engine/import requirements, asset dependencies, and actually available generation tools; write a compact Art Envelope and source Inventory.
+2. **Art Factory** — audit assets against a developer-approved art direction, refine/remake/create artwork through real image tooling, preserve originals, integrate only necessary asset/config/code changes, and verify visual and technical results.
+
+The target game's working files are:
+
+- .factorium/art/ART_ENVELOPE.md — discovered evidence, constraints, and unknowns.
+- .factorium/art/ART_INVENTORY.md — source map, dependencies, revisions, and review coverage.
+- .factorium/art/ART_DIRECTION.md — the **developer's** approved artistic objectives, references, scope, preservation rules, and decisions.
+- .factorium/art/ART_AUDIT.md — actual changes, generation attempts, adversarial reviews, validations, and unresolved issues.
+
+A starter for the direction is at skills/art-factory/ART_DIRECTION_TEMPLATE.md. The user controls creative direction; the system can recommend an overhaul but cannot authorize one.
+
+### Art Factory safeguards
+
+- Every substantive art recommendation requires a **real, representative generated/edited example**, a verified execution path, and at least **two genuinely independent adversarial Work subagents**. The technical and production reviewers both ask "Is this realistic?". Both rejecting feasibility forces a different recommendation; a demonstrated blocker from either reviewer must be resolved or surfaced. Do not pretend to have independent reviews if the runtime cannot provide them.
+- Run changes only within approved artistic scope. Use a default maximum of **three meaningful attempts** for an individual generation problem and **five corrective staging attempts** for recurring quality degradation before escalating with alternatives.
+- Actual image inspection and relevant technical integration checks are required for **"Visually reviewed, not seen in gameplay"**. Gameplay observation is optional and must be claimed only when performed.
+- Work must verify access to any backend (including local ComfyUI/hybrid bridges). A prompt or marketing demonstration does not prove execution.
+- The implementation determines overall production budgets and batch size. V1 does not perform art licensing/provenance audits or claim unverified 3D production support.
+
+See docs/WORK_ART_FACTORY_HANDOFF.md for Work-native acceptance tests. **These repository changes define the workflow; they do not mean the Work environment, subagents, generation backend, or in-game integration have already been tested.**
